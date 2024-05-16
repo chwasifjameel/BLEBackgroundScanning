@@ -13,11 +13,16 @@ struct DiscoveredPeripheral {
     // Struct to represent a discovered peripheral
     var peripheral: CBPeripheral
     var advertisedData: String
+    var timestamp: Date
+    var distance: Double
+
 }
 
 class BluetoothScanner: NSObject, CBCentralManagerDelegate, ObservableObject {
     @Published var discoveredPeripherals = [DiscoveredPeripheral]()
     @Published var isScanning = false
+    @ObservedObject private var Notifications = NotificationManager()
+
     var centralManager: CBCentralManager!
     // Set to store unique peripherals that have been discovered
     var discoveredPeripheralSet = Set<CBPeripheral>()
@@ -82,7 +87,26 @@ class BluetoothScanner: NSObject, CBCentralManagerDelegate, ObservableObject {
         }
     }
 
+   func removePeripheralAfter5secondsOfInactivityBasedOnTimeStamp() {
+    let currentTime = Date()
+    discoveredPeripherals.removeAll { peripheral in
+        let timeDifference = currentTime.timeIntervalSince(peripheral.timestamp)
+        return timeDifference > 5
+    }
+    objectWillChange.send()
+}
+    
+    func RSSIToDistanceInMeter(_ RSSI:NSNumber)->Double{
+        return pow(10, ((-69 - Double(truncating: RSSI)) - 40) / 20)
+    }
+
     func centralManager(_ central: CBCentralManager, didDiscover peripheral: CBPeripheral, advertisementData: [String : Any], rssi RSSI: NSNumber) {
+        
+        
+        let distance = RSSIToDistanceInMeter(RSSI)
+        
+        
+        
     // Check if the peripheral has already been discovered
     if !discoveredPeripheralSet.contains(peripheral) {
         // Add the peripheral to the set of discovered peripherals
@@ -90,12 +114,30 @@ class BluetoothScanner: NSObject, CBCentralManagerDelegate, ObservableObject {
 
         // Create a DiscoveredPeripheral object and add it to the array of discovered peripherals
 
-        let finalAdvertisementData="RSSI: \(RSSI) dBm\n" + "Distance: \(pow(10, ((-69 - Double(truncating: RSSI)) - 40) / 20)) m\n" + "Timestamp: \(Date())\n" + advertisementData.description
-        let discoveredPeripheral = DiscoveredPeripheral(peripheral: peripheral, advertisedData: finalAdvertisementData)
+        let discoveredPeripheral = DiscoveredPeripheral(peripheral: peripheral, advertisedData: advertisementData.description, timestamp: Date(), distance: distance )
+
         discoveredPeripherals.append(discoveredPeripheral)
 
-        // Notify observers that the discoveredPeripherals array has changed
+        Notifications.scheduleNotification(title: "New Beacon", body: "Discovered BTLR Beacon: \(peripheral.name ?? "Unknown Device") at distance \(distance) m")
+        
         objectWillChange.send()
     }
+        else{
+            
+            for i in 0..<discoveredPeripherals.count{
+                if discoveredPeripherals[i].peripheral == peripheral{
+                    
+                    discoveredPeripherals[i].advertisedData = advertisementData.description
+                    discoveredPeripherals[i].timestamp = Date()
+                    discoveredPeripherals[i].distance = distance
+
+                    objectWillChange.send()
+                    break
+                }
+            }
+
+            
+        }
+        removePeripheralAfter5secondsOfInactivityBasedOnTimeStamp()
 }
 }

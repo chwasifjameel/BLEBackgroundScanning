@@ -12,6 +12,7 @@
 		D03186232BF3768700C177B6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D03186222BF3768700C177B6 /* Assets.xcassets */; };
 		D03186272BF3768700C177B6 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D03186262BF3768700C177B6 /* Preview Assets.xcassets */; };
 		D031862F2BF3821800C177B6 /* BLEScannerClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = D031862E2BF3821800C177B6 /* BLEScannerClass.swift */; };
+		D03186312BF49B9F00C177B6 /* NotificationClass.swift in Sources */ = {isa = PBXBuildFile; fileRef = D03186302BF49B9F00C177B6 /* NotificationClass.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -23,6 +24,7 @@
 		D03186262BF3768700C177B6 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		D031862D2BF376D600C177B6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		D031862E2BF3821800C177B6 /* BLEScannerClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BLEScannerClass.swift; sourceTree = "<group>"; };
+		D03186302BF49B9F00C177B6 /* NotificationClass.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationClass.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -62,6 +64,7 @@
 				D03186222BF3768700C177B6 /* Assets.xcassets */,
 				D03186242BF3768700C177B6 /* BLEBacgroundScanning.entitlements */,
 				D03186252BF3768700C177B6 /* Preview Content */,
+				D03186302BF49B9F00C177B6 /* NotificationClass.swift */,
 			);
 			path = BLEBacgroundScanning;
 			sourceTree = "<group>";
@@ -147,6 +150,7 @@
 				D03186212BF3768600C177B6 /* ContentView.swift in Sources */,
 				D031862F2BF3821800C177B6 /* BLEScannerClass.swift in Sources */,
 				D031861F2BF3768600C177B6 /* BLEBacgroundScanningApp.swift in Sources */,
+				D03186312BF49B9F00C177B6 /* NotificationClass.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

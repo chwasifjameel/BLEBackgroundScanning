@@ -16,15 +16,17 @@ import CoreBluetooth
 
 struct ContentView: View {
     @ObservedObject private var bluetoothScanner = BluetoothScanner()
+    @ObservedObject private var Notifications = NotificationManager()
     @State private var searchText = ""
-
+    
+    
     var body: some View {
         VStack {
             HStack {
                 // Text field for entering search text
                 TextField("Search", text: $searchText)
                     .textFieldStyle(RoundedBorderTextFieldStyle())
-
+                
                 // Button for clearing search text
                 Button(action: {
                     self.searchText = ""
@@ -36,44 +38,56 @@ struct ContentView: View {
                 .opacity(searchText == "" ? 0 : 1)
             }
             .padding()
-
+            
             // List of discovered peripherals filtered by search text
             List(bluetoothScanner.discoveredPeripherals.filter {
                 self.searchText.isEmpty ? true : $0.peripheral.name?.lowercased().contains(self.searchText.lowercased()) == true
             }, id: \.peripheral.identifier) { discoveredPeripheral in
                 VStack(alignment: .leading) {
                     Text(discoveredPeripheral.peripheral.name ?? "Unknown Device")
-                    Text(discoveredPeripheral.advertisedData)
-                        .font(.caption)
-                        .foregroundColor(.gray)
+                    HStack {
+                        Text("Distance: \(discoveredPeripheral.distance) m")
+                        // Text("Distance: \(String(format: "%.2f", discoveredPeripheral.distance)) m")
+                    }
+                    HStack {
+                        Text("TimeStamp: \(discoveredPeripheral.timestamp, style: .time)")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                        Spacer()
+                    }
                 }
+                
+                // Button for starting or stopping scanning
+                Button(action: {
+                    if self.bluetoothScanner.isScanning {
+                        self.bluetoothScanner.stopScan()
+                        Notifications.scheduleNotification(title: "Stopped Scanning", body: "Scanning is stopped")
+                    } else {
+                        self.bluetoothScanner.startScan()
+                        Notifications.scheduleNotification(title: "Starting Scanning", body: "Scanning is running")
+                    }
+                }) {
+                    if bluetoothScanner.isScanning {
+                        Text("Stop Scanning")
+                        
+                    } else {
+                        Text("Scan for Devices")
+                    }
+                }
+                // Button looks cooler this way on iOS
+                .padding()
+                .background(bluetoothScanner.isScanning ? Color.red : Color.blue)
+                .foregroundColor(Color.white)
+                .cornerRadius(5.0)
+            }.onAppear{
+                Notifications.requestAuthorization();
             }
-
-            // Button for starting or stopping scanning
-            Button(action: {
-                if self.bluetoothScanner.isScanning {
-                    self.bluetoothScanner.stopScan()
-                } else {
-                    self.bluetoothScanner.startScan()
-                }
-            }) {
-                if bluetoothScanner.isScanning {
-                    Text("Stop Scanning")
-                } else {
-                    Text("Scan for Devices")
-                }
-            }
-            // Button looks cooler this way on iOS
-            .padding()
-            .background(bluetoothScanner.isScanning ? Color.red : Color.blue)
-            .foregroundColor(Color.white)
-            .cornerRadius(5.0)
         }
     }
-}
-
-struct ContentView_Previews: PreviewProvider {
-    static var previews: some View {
-        ContentView()
+    
+    struct ContentView_Previews: PreviewProvider {
+        static var previews: some View {
+            ContentView()
+        }
     }
 }
