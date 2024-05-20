@@ -41,14 +41,15 @@ class BluetoothScanner: NSObject, CBCentralManagerDelegate, ObservableObject {
             discoveredPeripheralSet.removeAll()
             objectWillChange.send()
 
-            let serviceUUIDs: [CBUUID] = [CBUUID(string: "2e938fd0-6a61-11ed-a1eb-0242ac120002")]
-
+             let serviceUUIDs: [CBUUID] = [CBUUID(string: "37003700-8382-7243-3637-463827367373")]
+            // let serviceUUIDs: [CBUUID] = [CBUUID(string: "181c")]
+//            let serviceUUIDs: [CBUUID] = []
             // Start scanning for peripherals
             centralManager.scanForPeripherals(withServices: serviceUUIDs, options: [CBCentralManagerScanOptionAllowDuplicatesKey: true])
 
             // Start a timer to stop and restart the scan every 2 seconds
             timer?.invalidate()
-            timer = Timer.scheduledTimer(withTimeInterval: 2.0, repeats: true) { [weak self] timer in
+            timer = Timer.scheduledTimer(withTimeInterval: 20.0, repeats: false) { [weak self] timer in
                 self?.centralManager.stopScan()
                 self?.centralManager.scanForPeripherals(withServices: serviceUUIDs, options: [CBCentralManagerScanOptionAllowDuplicatesKey: true])
             }
@@ -91,7 +92,7 @@ class BluetoothScanner: NSObject, CBCentralManagerDelegate, ObservableObject {
     let currentTime = Date()
     discoveredPeripherals.removeAll { peripheral in
         let timeDifference = currentTime.timeIntervalSince(peripheral.timestamp)
-        return timeDifference > 5
+        return timeDifference > 30
     }
     objectWillChange.send()
 }
@@ -106,9 +107,13 @@ class BluetoothScanner: NSObject, CBCentralManagerDelegate, ObservableObject {
         let distance = RSSIToDistanceInMeter(RSSI)
         
         
+        if(peripheral.name?.localizedCaseInsensitiveContains("") == true){
+            print("peripheral \(peripheral)")
+        }
         
     // Check if the peripheral has already been discovered
     if !discoveredPeripheralSet.contains(peripheral) {
+        print("Adding new device")
         // Add the peripheral to the set of discovered peripherals
         discoveredPeripheralSet.insert(peripheral)
 
@@ -138,6 +143,6 @@ class BluetoothScanner: NSObject, CBCentralManagerDelegate, ObservableObject {
 
             
         }
-        removePeripheralAfter5secondsOfInactivityBasedOnTimeStamp()
+//        removePeripheralAfter5secondsOfInactivityBasedOnTimeStamp()
 }
 }
