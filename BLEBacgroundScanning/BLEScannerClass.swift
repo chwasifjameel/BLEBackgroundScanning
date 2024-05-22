@@ -41,7 +41,7 @@ class BluetoothScanner: NSObject, CBCentralManagerDelegate, ObservableObject {
             discoveredPeripheralSet.removeAll()
             objectWillChange.send()
 
-             let serviceUUIDs: [CBUUID] = [CBUUID(string: "37003700-8382-7243-3637-463827367373")]
+             let serviceUUIDs: [CBUUID] = [CBUUID(string: "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa")]
             // let serviceUUIDs: [CBUUID] = [CBUUID(string: "181c")]
 //            let serviceUUIDs: [CBUUID] = []
             // Start scanning for peripherals

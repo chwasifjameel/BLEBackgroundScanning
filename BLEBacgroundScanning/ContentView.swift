@@ -5,46 +5,57 @@
 //  Created by Wasif Jameel on 14/05/2024.
 //
 //
-//  ContentView.swift
-//  BLEScanner
-//
-//  Created by Christian Möller on 02.01.23.
-//
 
 import SwiftUI
 import CoreBluetooth
 
 struct ContentView: View {
-    @ObservedObject private var bluetoothScanner = BluetoothScanner()
+//    @ObservedObject private var bluetoothScanner = BluetoothScanner()
     @ObservedObject private var Notifications = NotificationManager()
+    @ObservedObject private var BManager = BeaconManager()
     @State private var searchText = ""
     
     
     var body: some View {
         VStack {         
             // List of discovered peripherals filtered by search text
-            List(bluetoothScanner.discoveredPeripherals ,id: \.peripheral.identifier)
-                 { discoveredPeripheral in
+            List(BManager.discoveredBeacons ,id: \.identifier)
+                 { beacon in
                     VStack(alignment: .leading) {
-                        Text(discoveredPeripheral.peripheral.name ?? "Unknown Device")
+                        HStack{
+                            Text("Unique ID")
+                            Text( beacon.identifier ?? "Unknown Device")
+                        }.font(Font.caption)
                         HStack {
-                            Text("Distance: \(discoveredPeripheral.distance) m")
+                            Text("Distance: \(beacon.distance)")
                             // Text("Distance: \(String(format: "%.2f", discoveredPeripheral.distance)) m")
                         }
                         HStack {
-                            Text("TimeStamp: \(discoveredPeripheral.timestamp, style: .time)")
+                            Text("Major: \(beacon.major)")
                                 .font(.caption)
                                 .foregroundColor(.gray)
                             Spacer()
                         }
                         HStack{
-                            Text("Advertised Data: \(discoveredPeripheral.advertisedData)")
+                            Text("Minor: \(beacon.minor)")
                                 .font(.caption)
                                 .foregroundColor(.gray)
                             Spacer()
                         }
                         HStack{
-                            Text("Random: \(discoveredPeripheral.advertisedData)")
+                            Text("RSSI: \(beacon.rssi)")
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                            Spacer()
+                        }
+                        HStack{
+                            Text("Proximity: \(beacon.proximity)")
+                                .font(.caption)
+                                .foregroundColor(.gray)
+                            Spacer()
+                        }
+                        HStack{
+                            Text("Timestamp: \(beacon.timestamp)")
                                 .font(.caption)
                                 .foregroundColor(.gray)
                             Spacer()
@@ -53,24 +64,21 @@ struct ContentView: View {
             }
             // Button for starting or stopping scanning
             Button(action: {
-                if self.bluetoothScanner.isScanning {
-                    self.bluetoothScanner.stopScan()
-                    Notifications.scheduleNotification(title: "Stopped Scanning", body: "Scanning is stopped")
+                if self.BManager.isScanning {
+                    BManager.stopScanning()
                 } else {
-                    self.bluetoothScanner.startScan()
-                    Notifications.scheduleNotification(title: "Starting Scanning", body: "Scanning is running")
+                    BManager.startScanning()
                 }
             }) {
-                if bluetoothScanner.isScanning {
+                if BManager.isScanning {
                     Text("Stop Scanning")
-                    
                 } else {
                     Text("Scan for Devices")
                 }
             }
             // Button looks cooler this way on iOS
             .padding()
-            .background(bluetoothScanner.isScanning ? Color.red : Color.blue)
+            .background(BManager.isScanning ? Color.red : Color.blue)
             .foregroundColor(Color.white)
             .cornerRadius(5.0)
             }.onAppear{
